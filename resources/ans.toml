@@ -1,0 +1,6 @@
+[forge]
+proto_version = 1
+path = "~/.forge/core"
+logpath = "logs"
+sock_grpc = "tcp://127.0.0.1:27210"
+pub_sub_key = "ABTTOTHEMOON"

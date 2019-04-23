@@ -1,0 +1,33 @@
+---
+name: create_domain
+
+check:
+  - pipe: verify_info
+    conditions:
+      - [info.itx.data !== nil, :insufficient_data]
+
+verify:
+  - pipe: extract_state
+    from: [:itx, :parent]
+    to: [:priv, :parent_asset]
+    status: :ok
+  - pipe: verify_info
+    conditions:
+      - [info.itx.parent === "" or info.priv.parent_asset !== nil, :invalid_asset]
+  - pipe: extract_asset_address
+    to: [:priv, :asset_address]
+  - pipe: extract_state
+    from: [:priv, :asset_address]
+    to: [:priv, :asset]
+    status: :ok
+  # if the asset exists, that means user is trying to create a duplicate asset. Do not allow this.
+  - pipe: verify_info
+    conditions:
+      - [info.priv.asset === nil, :invalid_asset]
+
+update:
+  - pipe: :custom
+    name: update_tx
+    address: [:priv, :asset_address]
+  - pipe: :custom
+    name: update_local_db

@@ -1,0 +1,12 @@
+{
+  "name": "create_domain",
+  "version": 0,
+  "namespace": "CoreTx",
+  "description": "Create a new domain",
+  "type_urls": {
+    "fg:t:create_domain": "ForgeAbi.CreateDomainTx"
+  },
+  "proto": "protocol.proto",
+  "pipeline": "protocol.yml",
+  "sources": ["protocol.ex"]
+}
