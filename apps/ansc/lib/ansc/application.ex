@@ -16,21 +16,23 @@ defmodule Ansc.Application do
 
   @doc false
   def install_domain_tx do
+    wallet = new_wallet()
+
     install_tx(
-      "/Users/redink/arcblock/github/ans/apps/ansc/lib/ansc/tx/create_domain/create_domain.itx.json"
+      "/Users/redink/arcblock/github/ans/apps/ansc/lib/ansc/tx/create_domain/create_domain.itx.json",
+      "create_domain",
+      wallet
+    )
+
+    install_tx(
+      "/Users/redink/arcblock/github/ans/apps/ansc/lib/ansc/tx/update_domain/update_domain.itx.json",
+      "update_domain",
+      wallet
     )
   end
 
   @doc false
-  defp install_tx(file_name) do
-    itx =
-      file_name
-      |> File.read!()
-      |> Jason.decode!()
-      |> Map.get("create_domain")
-      |> Base.url_decode64!(padding: false)
-      |> ForgeAbi.DeployProtocolTx.decode()
-
+  defp new_wallet do
     wallet =
       ForgeAbi.WalletInfo.new(
         address: "z11N3R6GZrNingR11Dub9EbVMJGgyZTJGMQB",
@@ -43,12 +45,24 @@ defmodule Ansc.Application do
       )
 
     ForgeSdk.declare(ForgeAbi.DeclareTx.new(moniker: "moderator"), wallet: wallet)
-    ForgeSdk.deploy_protocol(itx, wallet: wallet)
+    wallet
+  end
+
+  @doc false
+  defp install_tx(file_name, action_name, wallet) do
+    file_name
+    |> File.read!()
+    |> Jason.decode!()
+    |> Map.get(action_name)
+    |> Base.url_decode64!(padding: false)
+    |> ForgeAbi.DeployProtocolTx.decode()
+    |> ForgeSdk.deploy_protocol(wallet: wallet)
   end
 
   @doc false
   defp add_type_urls do
     ForgeAbi.add_type_url("fg:t:create_domain", ForgeAbi.CreateDomainTx)
+    ForgeAbi.add_type_url("fg:t:update_domain", ForgeAbi.UpdateDomainTx)
   end
 
   # __end_of_module__

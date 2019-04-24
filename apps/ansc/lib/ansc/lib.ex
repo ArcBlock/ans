@@ -1,8 +1,10 @@
 defmodule Ansc.Lib do
   @moduledoc false
 
-  alias CoreTx.CreateDomain.Rpc
-  alias ForgeAbi.CreateDomainTx
+  alias Ansc.Cache.Domain
+  alias CoreTx.CreateDomain.Rpc, as: CreateRpc
+  alias CoreTx.UpdateDomain.Rpc, as: UpdateRpc
+  alias ForgeAbi.{CreateDomainTx, UpdateDomainTx}
   alias Google.Protobuf.Any
 
   @doc """
@@ -16,31 +18,73 @@ defmodule Ansc.Lib do
 
   """
   def create_domain(wallet, token, domain, zone_info) do
-    {domain_address, domain_itx} = create_domain_itx(wallet, domain, zone_info)
+    domain_itx = create_domain_itx(domain, zone_info)
 
-    {domain_address,
-     ForgeSdk.send_tx(
-       tx: Rpc.create_domain(domain_itx, wallet: wallet, token: token, send: :nosend)
-     )}
+    ForgeSdk.send_tx(
+      tx: CreateRpc.create_domain(domain_itx, wallet: wallet, token: token, send: :nosend)
+    )
   end
 
   @doc false
-  defp create_domain_itx(wallet, domain, zone_info) do
-    domain_itx =
-      CreateDomainTx.new(data: Any.new(type_url: domain, data: zone_info), transferrable: true)
-
-    {ForgeSdk.Util.to_asset_address(wallet.address, domain_itx), domain_itx}
+  defp create_domain_itx(domain, zone_info) do
+    CreateDomainTx.new(
+      data: Any.new(type_url: domain, value: zone_info),
+      transferrable: true,
+      address: domain
+    )
   end
 
   @doc """
 
   """
-  def get_domain_by_address(domain_address) do
-    [address: domain_address]
-    |> ForgeSdk.get_asset_state()
-    |> Map.get(:data, %{})
-    |> Map.drop([:__struct__])
+  def update_domain(wallet, token, domain, zone_info) do
+    domain_itx = update_domain_itx(domain, zone_info)
+
+    ForgeSdk.send_tx(
+      tx: UpdateRpc.update_domain(domain_itx, wallet: wallet, token: token, send: :nosend)
+    )
   end
+
+  @doc false
+  defp update_domain_itx(domain, zone_info) do
+    UpdateDomainTx.new(
+      data: Any.new(type_url: domain, value: zone_info),
+      address: domain
+    )
+  end
+
+  @doc """
+
+  """
+  def get_domain(domain) do
+    case Domain.get_with_ttl(domain) do
+      :"$not_can_found" ->
+        domain
+        |> get_domain_by_address_from_forge()
+        |> maybe_create_cache(domain)
+
+      zone ->
+        zone
+    end
+  end
+
+  @doc false
+  defp get_domain_by_address_from_forge(domain) do
+    [address: domain]
+    |> ForgeSdk.get_asset_state()
+    |> case do
+      nil ->
+        nil
+
+      state ->
+        state
+        |> Map.get(:data, %{})
+        |> Map.get(:value, "")
+    end
+  end
+
+  @doc false
+  defp maybe_create_cache(zone, _domain), do: zone
 
   # __end_of_module__
 end

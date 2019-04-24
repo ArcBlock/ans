@@ -3,6 +3,8 @@ defmodule Ansc do
   Documentation for Ansc.
   """
 
+  alias Ansc.Lib
+
   @doc """
 
   """
@@ -19,6 +21,7 @@ defmodule Ansc do
 
   """
   def get_domain(domain) do
+    Lib.get_domain(domain)
   end
 
   @doc """

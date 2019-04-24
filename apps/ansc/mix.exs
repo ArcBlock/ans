@@ -26,6 +26,7 @@ defmodule Ansc.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:mcc, "~> 1.2"},
       {:forge_core_protocols, git: "git@github.com:ArcBlock/forge-core-protocols.git"}
     ]
   end

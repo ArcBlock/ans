@@ -1,0 +1,12 @@
+{
+  "name": "update_domain",
+  "version": 0,
+  "namespace": "CoreTx",
+  "description": "Update an existing domain owned by sender",
+  "type_urls": {
+    "fg:t:update_domain": "ForgeAbi.UpdateDomainTx"
+  },
+  "proto": "protocol.proto",
+  "pipeline": "protocol.yml",
+  "sources": ["protocol.ex"]
+}

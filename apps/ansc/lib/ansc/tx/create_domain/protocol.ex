@@ -4,6 +4,23 @@ defmodule CoreTx.CreateDomain do
     tx(:create_domain)
   end
 
+  defmodule ExtractDomainAddress do
+    use ForgePipe.Builder
+    def init(opts), do: opts
+
+    def call(%{itx: itx} = info, opts) do
+      status =
+        case itx.address === "" do
+          true -> :invalid_asset
+          false -> :ok
+        end
+
+      info
+      |> put(opts[:to], itx.address)
+      |> put_status(status)
+    end
+  end
+
   defmodule UpdateTx do
     @moduledoc """
     create asset pipe

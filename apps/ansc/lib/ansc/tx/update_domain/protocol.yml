@@ -1,0 +1,22 @@
+---
+name: update_domain
+
+check:
+  - pipe: verify_info
+    conditions:
+      - [info.itx.data !== nil and info.itx.address !== "", :insufficient_data]
+
+verify:
+  - pipe: extract_state
+    from: [:itx, :address]
+    to: [:priv, :asset]
+    status: :invalid_asset
+  - pipe: verify_modifiable
+    asset: [:priv, :asset]
+  - pipe: verify_owner
+    assets: [:priv, :asset]
+    state: :sender_state
+update:
+  - pipe: :custom
+    name: update_tx
+    asset: [:priv, :asset]
