@@ -7,18 +7,18 @@ defmodule Ansc.Application do
 
   def start(_type, _args) do
     # forgesdk init env
-    ForgeSdk.init(:forge) |> IO.inspect()
-    Application.get_env(:forge_sdk, :otp_app, :undefined) |> IO.inspect
-    Application.get_env(:forge, :forge_config) |> IO.inspect
-    ForgeSdk.get_env(:forge_config) |> IO.inspect
-    # install_domain_tx()
+    ForgeSdk.init(:ansc)
+    install_domain_tx()
+    add_type_urls()
     children = []
     Supervisor.start_link(children, strategy: :one_for_one, name: Ansc.Supervisor)
   end
 
   @doc false
   def install_domain_tx do
-    install_tx("/Users/redink/arcblock/github/ans/apps/ansc/lib/ansc/tx/create_domain/create_domain.itx.json")
+    install_tx(
+      "/Users/redink/arcblock/github/ans/apps/ansc/lib/ansc/tx/create_domain/create_domain.itx.json"
+    )
   end
 
   @doc false
@@ -44,6 +44,11 @@ defmodule Ansc.Application do
 
     ForgeSdk.declare(ForgeAbi.DeclareTx.new(moniker: "moderator"), wallet: wallet)
     ForgeSdk.deploy_protocol(itx, wallet: wallet)
+  end
+
+  @doc false
+  defp add_type_urls do
+    ForgeAbi.add_type_url("fg:t:create_domain", ForgeAbi.CreateDomainTx)
   end
 
   # __end_of_module__
