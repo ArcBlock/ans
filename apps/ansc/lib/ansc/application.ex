@@ -19,8 +19,8 @@ defmodule Ansc.Application do
     wallet = new_wallet()
 
     install_tx(
-      "/Users/redink/arcblock/github/ans/apps/ansc/lib/ansc/tx/create_domain/create_domain.itx.json",
-      "create_domain",
+      "/Users/redink/arcblock/github/ans/apps/ansc/lib/ansc/tx/register_domain/register_domain.itx.json",
+      "register_domain",
       wallet
     )
 
@@ -61,7 +61,7 @@ defmodule Ansc.Application do
 
   @doc false
   defp add_type_urls do
-    ForgeAbi.add_type_url("fg:t:create_domain", ForgeAbi.CreateDomainTx)
+    ForgeAbi.add_type_url("fg:t:register_domain", ForgeAbi.RegisterDomainTx)
     ForgeAbi.add_type_url("fg:t:update_domain", ForgeAbi.UpdateDomainTx)
   end
 

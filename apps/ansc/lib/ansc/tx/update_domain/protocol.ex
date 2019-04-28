@@ -10,8 +10,6 @@ defmodule CoreTx.UpdateDomain do
     """
     use ForgePipe.Builder
 
-    alias ForgeSdk.State
-
     def init(opts), do: opts
 
     def call(%{tx: tx, itx: itx} = info, opts) do
@@ -26,7 +24,7 @@ defmodule CoreTx.UpdateDomain do
     # private function
     defp update_owner(%{tx: tx, sender_state: owner_state, context: context} = info) do
       attrs = %{nonce: tx.nonce}
-      owner_state = State.update(owner_state, attrs, context)
+      owner_state = CoreState.Account.update(owner_state, attrs, context)
 
       :ok = info.db_handler.put!(owner_state.address, owner_state)
       put(info, :sender_state, owner_state)
@@ -37,7 +35,7 @@ defmodule CoreTx.UpdateDomain do
       domain = get(info, path)
       attrs = itx |> Map.from_struct() |> Map.delete(:address)
 
-      domain_state = State.update(domain, attrs, context)
+      domain_state = CoreState.Asset.update(domain, attrs, context)
       :ok = info.db_handler.put!(itx.address, domain_state)
       put(info, path, domain_state)
     end

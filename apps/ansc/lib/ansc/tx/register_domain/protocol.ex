@@ -1,7 +1,7 @@
-defmodule CoreTx.CreateDomain do
+defmodule CoreTx.RegisterDomain do
   defmodule Rpc do
     import ForgeSdk.Rpc.Tx.Builder, only: [tx: 1]
-    tx(:create_domain)
+    tx(:register_domain)
   end
 
   defmodule ExtractDomainAddress do
@@ -21,31 +21,77 @@ defmodule CoreTx.CreateDomain do
     end
   end
 
+  defmodule ExtractDomainValue do
+    use ForgeAbi.Unit
+    use ForgePipe.Builder
+
+    def init(opts), do: opts
+
+    def call(info, opts) do
+      info
+      |> put(opts[:to], biguint(opts[:value]))
+      |> put_status(:ok)
+    end
+  end
+
   defmodule UpdateTx do
     @moduledoc """
-    create asset pipe
+    Register domain pipe
     """
+    use ForgeAbi.Unit
     use ForgePipe.Builder
     alias ForgeAbi.AssetState
-    alias ForgeSdk.State
 
     def init(opts), do: opts
 
     def call(%{tx: tx} = info, opts) do
-      Logger.debug(fn -> "[pipe - create_asset/update]: from #{tx.from}." end)
+      Logger.debug(fn -> "[pipe - register_domain/update]: from #{tx.from}." end)
 
       address = get(info, opts[:address])
 
       info
+      |> update_balance(opts)
       |> update_owner()
       |> update_asset(address)
+      |> put_status(:ok)
+    end
+
+    @doc false
+    defp update_balance(%{sender_state: sender_state, db_handler: handler} = info, opts) do
+      domain_value = to_uint(get(info, opts[:value]))
+      bill_collector = opts[:bill_collector]
+
+      new_sender_state =
+        CoreState.Account.update(
+          sender_state,
+          %{
+            nonce: info.tx.nonce,
+            balance: sender_state.balance - domain_value
+          },
+          info.context
+        )
+
+      :ok = handler.put!(sender_state.address, new_sender_state)
+      receiver_state = handler.get(bill_collector)
+
+      new_receiver_state =
+        CoreState.Account.update(
+          receiver_state,
+          %{balance: receiver_state.balance + domain_value},
+          info.context
+        )
+
+      :ok = handler.put!(bill_collector, new_receiver_state)
+
+      info
+      |> put(:sender_state, new_sender_state)
       |> put_status(:ok)
     end
 
     # private function
     defp update_owner(%{tx: tx, sender_state: owner_state, context: context} = info) do
       attrs = %{nonce: tx.nonce, num_assets: owner_state.num_assets + 1}
-      owner_state = State.update(owner_state, attrs, context)
+      owner_state = CoreState.Account.update(owner_state, attrs, context)
 
       :ok = info.db_handler.put!(owner_state.address, owner_state)
       %{info | sender_state: owner_state}
@@ -62,18 +108,9 @@ defmodule CoreTx.CreateDomain do
         |> Map.put(:issuer, address)
         |> Map.put(:transferrable, true)
 
-      asset_state = State.create(%AssetState{}, attrs, context)
+      asset_state = CoreState.Asset.create(AssetState.new(), attrs, context)
       :ok = info.db_handler.put!(asset_address, asset_state)
       put(info, [:priv, :asset], asset_state)
-    end
-  end
-
-  defmodule UpdateLocalDb do
-    use ForgePipe.Builder
-    def init(opts), do: opts
-
-    def call(info, _opts) do
-      info |> IO.inspect()
     end
   end
 

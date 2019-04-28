@@ -1,5 +1,5 @@
 ---
-name: create_domain
+name: register_domain
 
 check:
   - pipe: verify_info
@@ -10,16 +10,25 @@ verify:
   - pipe: :custom
     name: extract_domain_address
     to: [:priv, :domain_address]
+  - pipe: :custom
+    name: extract_domain_value
+    to: [:priv, :domain_value]
+    value: 2000
   - pipe: extract_state
     from: [:priv, :domain_address]
     to: [:priv, :domain]
     status: :ok
-  # if the domain exists, that means user is trying to create a duplicate domain. Do not allow this.
+  # if the domain exists, that means user is trying to register a duplicate domain. Do not allow this.
   - pipe: verify_info
     conditions:
       - [info.priv.domain === nil, :invalid_asset]
+  - pipe: verify_balance
+    state: :sender_state
+    value: [[:priv, :domain_value]]
 
 update:
   - pipe: :custom
     name: update_tx
     address: [:priv, :domain_address]
+    value: [:priv, :domain_value]
+    bill_collector: z119dJoAB9SWt4oNnCe7h6jv9wJ78Df7pbcN

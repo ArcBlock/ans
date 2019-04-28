@@ -1,10 +1,10 @@
 {
-  "name": "create_domain",
+  "name": "register_domain",
   "version": 0,
   "namespace": "CoreTx",
-  "description": "Create a new domain",
+  "description": "Register a new domain",
   "type_urls": {
-    "fg:t:create_domain": "ForgeAbi.CreateDomainTx"
+    "fg:t:register_domain": "ForgeAbi.RegisterDomainTx"
   },
   "proto": "protocol.proto",
   "pipeline": "protocol.yml",

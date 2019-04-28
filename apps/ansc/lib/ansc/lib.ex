@@ -2,9 +2,9 @@ defmodule Ansc.Lib do
   @moduledoc false
 
   alias Ansc.Cache.Domain
-  alias CoreTx.CreateDomain.Rpc, as: CreateRpc
+  alias CoreTx.RegisterDomain.Rpc, as: CreateRpc
   alias CoreTx.UpdateDomain.Rpc, as: UpdateRpc
-  alias ForgeAbi.{CreateDomainTx, UpdateDomainTx}
+  alias ForgeAbi.{RegisterDomainTx, UpdateDomainTx}
   alias Google.Protobuf.Any
 
   @doc """
@@ -17,17 +17,17 @@ defmodule Ansc.Lib do
   @doc """
 
   """
-  def create_domain(wallet, token, domain, zone_info) do
-    domain_itx = create_domain_itx(domain, zone_info)
+  def register_domain(wallet, token, domain, zone_info) do
+    domain_itx = register_domain_itx(domain, zone_info)
 
     ForgeSdk.send_tx(
-      tx: CreateRpc.create_domain(domain_itx, wallet: wallet, token: token, send: :nosend)
+      tx: CreateRpc.register_domain(domain_itx, wallet: wallet, token: token, send: :nosend)
     )
   end
 
   @doc false
-  defp create_domain_itx(domain, zone_info) do
-    CreateDomainTx.new(
+  defp register_domain_itx(domain, zone_info) do
+    RegisterDomainTx.new(
       data: Any.new(type_url: domain, value: zone_info),
       transferrable: true,
       address: domain
