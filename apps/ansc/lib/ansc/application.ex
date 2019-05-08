@@ -44,7 +44,7 @@ defmodule Ansc.Application do
           )
       )
 
-    ForgeSdk.declare(ForgeAbi.DeclareTx.new(moniker: "moderator"), wallet: wallet)
+    # ForgeSdk.declare(moniker: "moderator", wallet: wallet) |> IO.inspect
     wallet
   end
 
@@ -57,6 +57,7 @@ defmodule Ansc.Application do
     |> Base.url_decode64!(padding: false)
     |> ForgeAbi.DeployProtocolTx.decode()
     |> ForgeSdk.deploy_protocol(wallet: wallet)
+    |> IO.inspect()
   end
 
   @doc false

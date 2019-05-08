@@ -1,7 +1,7 @@
 defmodule CoreTx.UpdateDomain do
   defmodule Rpc do
-    import ForgeSdk.Rpc.Tx.Builder, only: [tx: 1]
-    tx(:update_domain)
+    import ForgeSdk.Tx.Builder, only: [tx: 2]
+    tx(:update_domain, multisig: true)
   end
 
   defmodule UpdateTx do

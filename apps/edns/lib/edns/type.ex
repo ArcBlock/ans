@@ -10,6 +10,7 @@ defmodule Edns.Type do
   def encode(SOA), do: 6
   def encode(AAAA), do: 28
   def encode(ANY), do: 255
+  def encode(SRV), do: 33
 
   @doc """
 
@@ -20,6 +21,7 @@ defmodule Edns.Type do
   def decode(6), do: SOA
   def decode(28), do: AAAA
   def decode(255), do: ANY
+  def decode(33), do: SRV
 
   # __end_of_module__
 end

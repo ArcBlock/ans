@@ -31,4 +31,4 @@ update:
     name: update_tx
     address: [:priv, :domain_address]
     value: [:priv, :domain_value]
-    bill_collector: z119dJoAB9SWt4oNnCe7h6jv9wJ78Df7pbcN
+    bill_collector: z11dSwF1jeT4QigPd1rtttmwDp6vPdUHzfu

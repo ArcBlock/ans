@@ -1,7 +1,7 @@
 defmodule CoreTx.RegisterDomain do
   defmodule Rpc do
-    import ForgeSdk.Rpc.Tx.Builder, only: [tx: 1]
-    tx(:register_domain)
+    import ForgeSdk.Tx.Builder, only: [tx: 2]
+    tx(:register_domain, multisig: true)
   end
 
   defmodule ExtractDomainAddress do

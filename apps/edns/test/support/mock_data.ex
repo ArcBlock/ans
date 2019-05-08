@@ -435,6 +435,50 @@ defmodule Edns.Test.Support.MockData do
                            "data": "1.1.1.5"
                        },
                        {
+                           "name": "_ldap._tcp.dc.test.com",
+                           "type": "SRV",
+                           "ttl": 3600,
+                           "data": {
+                               "priority": 0,
+                               "weight": 100,
+                               "port": 389,
+                               "target": "server2.example.net"
+                           }
+                       },
+                       {
+                           "name": "_double._tcp.dc.test.com",
+                           "type": "SRV",
+                           "ttl": 3600,
+                           "data": {
+                               "priority": 0,
+                               "weight": 100,
+                               "port": 389,
+                               "target": "server1.test.com"
+                           }
+                       },
+                       {
+                           "name": "_double._tcp.dc.test.com",
+                           "type": "SRV",
+                           "ttl": 3600,
+                           "data": {
+                               "priority": 1,
+                               "weight": 100,
+                               "port": 389,
+                               "target": "server1.test.com"
+                           }
+                       },
+                       {
+                           "name": "_root._tcp.dc.test.com",
+                           "type": "SRV",
+                           "ttl": 3600,
+                           "data": {
+                               "priority": 0,
+                               "weight": 0,
+                               "port": 0,
+                               "target": ""
+                           }
+                       },
+                       {
                            "name": "blah.test.com",
                            "type": "NS",
                            "ttl": 3600,

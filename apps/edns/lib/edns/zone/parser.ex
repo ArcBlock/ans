@@ -99,6 +99,20 @@ defmodule Edns.Zone.Parser do
     %DnsRr{name: name, type: CNAME, data: %DnsRrdataCname{dname: data}, ttl: ttl}
   end
 
+  defp parse_record(%{type: "SRV", name: name, ttl: ttl, data: data}) do
+    %DnsRr{
+      name: name,
+      type: SRV,
+      data: %DnsRrdataSrv{
+        priority: Map.get(data, :priority),
+        weight: Map.get(data, :weight),
+        port: Map.get(data, :port),
+        target: Map.get(data, :target)
+      },
+      ttl: ttl
+    }
+  end
+
   defp parse_record(_), do: nil
 
   # __end_of_module__
